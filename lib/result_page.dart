@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:html' as html;
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({Key? key}) : super(key: key);
@@ -24,21 +26,24 @@ class _ResultPageState extends State<ResultPage> {
   String _imagePrediction = '';
   late double _imageWidth;
   late double _imageHeight;
+  PlatformFile? objFile = null;
 
-  selectFromImagePicker(bool fromCamera) async {
-    PickedFile? pickedFile = fromCamera
-        ? await _picker.getImage(source: ImageSource.camera)
-        : await _picker.getImage(source: ImageSource.gallery);
-    print(pickedFile.readAsBytes());
-    File image = File(pickedFile!.path);
+  // selectFromImagePicker(bool fromCamera) async {
+    // PickedFile? pickedFile = fromCamera
+    //     ? await _picker.getImage(source: ImageSource.camera)
+    //     : await _picker.getImage(source: ImageSource.gallery);
+    // print(pickedFile.readAsBytes());
+    // File image = File(pickedFile!.path);
+    //
+    // if (image == null) return;
+    // setState(() {
+    //   _imageOriginal = image;
+    //   _busy = true;
+    // });
+    // predictImage(image);
 
-    if (image == null) return;
-    setState(() {
-      // _imageOriginal = image;
-      // _busy = true;
-    });
-    predictImage(image);
-  }
+
+  // }
 
   predictImage(File image) async {
     if (image == null) return;
@@ -58,6 +63,45 @@ class _ResultPageState extends State<ResultPage> {
     // _setLoading(false);
   }
 
+  ConvertFileToCast(data){
+    List<int> list = List.from(data);
+    return list;
+  }
+
+  selectImage() async {
+    // FilePickerResult? result = await FilePicker.platform.pickFiles();
+    var result = await FilePicker.platform.pickFiles(withReadStream: true);
+
+    // Map<String, String> headers = {"Content-type": "multipart/form-data"};
+
+    if (result != null) {
+      objFile = result.files.single;
+      final fileReadStream = objFile?.readStream;
+      final stream = http.ByteStream(fileReadStream!);
+      // File file = File(result.files.single.path!);
+      // Uint8List _fileBytes = result.files.single.bytes!;
+      var request = http.MultipartRequest('POST', Uri.parse('https://global-axe-348019.uc.r.appspot.com/image'));
+      // request.headers.addAll(headers);
+      request.files.add(
+          http.MultipartFile(
+              'images',
+              stream, objFile!.size,
+              filename: 'upload.png',
+              contentType: MediaType('*', '*')
+          )
+      );
+      // request.fields.addAll(fields);
+      // final httpClient = http.Client();
+      // final response = await httpClient.send(request);
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      setState(() {
+        _imagePrediction = response.body;
+      });
+    } else {
+      // User canceled the picker
+    }
+  }
 
 
   detect(File image) async {
@@ -160,13 +204,14 @@ class _ResultPageState extends State<ResultPage> {
                             Text('Raw Image', style: TextStyle(
                                 color: Colors.white
                             )),
-                            // if (_imagePrediction != '') Image.memory(base64Decode(_imagePrediction)),
+                            if (_imagePrediction != '') Image.memory(base64Decode(_imagePrediction)),
                             // Text('Overlayed', style: TextStyle(
                             //     color: Colors.white
                             // )),
                             GestureDetector(
                               onTap: () async {
-                                selectFromImagePicker(false);
+                                // selectFromImagePicker(false);
+                                selectImage();
                               },
                               child: Container(
                                   alignment: Alignment.center,
