@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({Key? key}) : super(key: key);
@@ -22,129 +23,70 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   ImagePicker _picker = ImagePicker();
   // late String _imageOriginalPath;
-  late File _imageOriginal = File('assets/images/LASTPAGE/placeholder.jpg');
+  String _imageOriginal = '';
   String _imagePrediction = '';
   late double _imageWidth;
   late double _imageHeight;
   PlatformFile? objFile = null;
 
-  // selectFromImagePicker(bool fromCamera) async {
-    // PickedFile? pickedFile = fromCamera
-    //     ? await _picker.getImage(source: ImageSource.camera)
-    //     : await _picker.getImage(source: ImageSource.gallery);
-    // print(pickedFile.readAsBytes());
-    // File image = File(pickedFile!.path);
-    //
-    // if (image == null) return;
-    // setState(() {
-    //   _imageOriginal = image;
-    //   _busy = true;
-    // });
-    // predictImage(image);
+  late String _epochs;
+  late String _learningRate;
+  late String _architecture;
 
-
-  // }
-
-  predictImage(File image) async {
-    if (image == null) return;
-
-    // _setLoading(true);
-
-    await detect(image);
-
-    FileImage(image)
-        .resolve(ImageConfiguration())
-        .addListener((ImageStreamListener((ImageInfo info, bool _) {
-      setState(() {
-        _imageWidth = info.image.width.toDouble();
-        _imageHeight = info.image.height.toDouble();
-      });
-    })));
-    // _setLoading(false);
-  }
-
-  ConvertFileToCast(data){
-    List<int> list = List.from(data);
-    return list;
-  }
-
-  selectImage() async {
-    // FilePickerResult? result = await FilePicker.platform.pickFiles();
-    var result = await FilePicker.platform.pickFiles(withReadStream: true);
-
-    // Map<String, String> headers = {"Content-type": "multipart/form-data"};
-
+  selectImageAndPredict() async {
+    var result = await FilePicker.platform.pickFiles();
+    
+    // var result2 = FilePickerResult(result!.files);
+    // var result2 = await FilePicker.platform.pickFiles(withReadStream: true);
+    // var result2 = List.from(result!.files);
     if (result != null) {
-      objFile = result.files.single;
-      final fileReadStream = objFile?.readStream;
-      final stream = http.ByteStream(fileReadStream!);
-      // File file = File(result.files.single.path!);
-      // Uint8List _fileBytes = result.files.single.bytes!;
-      var request = http.MultipartRequest('POST', Uri.parse('https://global-axe-348019.uc.r.appspot.com/image'));
-      // request.headers.addAll(headers);
+      // result!.files.add(result.files.single);
+      Uint8List file = result.files.single.bytes!;
+
+
+      // objFile = result.files.single;
+      // int size = objFile!.size;
+      // final fileReadStream = ValueConnectableStream(objFile!.readStream!).autoConnect();
+      // final fileReadStream = objFile!.readStream!.asBroadcastStream();
+
+      // print(await fileReadStream.length);
+
+
+      // final stream = http.ByteStream(fileReadStream!);
+
+      // print(await fileReadStream.length);
+      // print(await stream.length);
+      var request = http.MultipartRequest('POST', Uri.parse('http://127.0.0.1:5000/original'));
+
       request.files.add(
-          http.MultipartFile(
+          http.MultipartFile.fromBytes(
               'images',
-              stream, objFile!.size,
+              file,
               filename: 'upload.png',
               contentType: MediaType('*', '*')
           )
       );
-      // request.fields.addAll(fields);
-      // final httpClient = http.Client();
-      // final response = await httpClient.send(request);
       var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
+      var predictionResponse = await http.Response.fromStream(streamedResponse);
+
+      request = http.MultipartRequest('POST', Uri.parse('http://127.0.0.1:5000/image-64'));
+
+      request.files.add(
+          http.MultipartFile.fromBytes(
+              'images',
+              file,
+              filename: 'upload.png',
+              contentType: MediaType('*', '*')
+          )
+      );
+      streamedResponse = await request.send();
+      var originalResponse = await http.Response.fromStream(streamedResponse);
+
       setState(() {
-        _imagePrediction = response.body;
+        _imagePrediction = predictionResponse.body;
+        _imageOriginal = originalResponse.body;
       });
-    } else {
-      // User canceled the picker
     }
-  }
-
-
-  detect(File image) async {
-    Dio dio = new Dio();
-
-    // FormData formDataDetections = FormData.fromMap({
-    //   "images": await MultipartFile.fromFile(image.path, filename: "upload.jpg")
-    // });
-
-    // Android
-    // FormData formDataImage = FormData.fromMap({
-    //   "images": await MultipartFile.fromFile(image.path, filename: "upload.jpg")
-    // });
-    var postUri = Uri.parse("http://global-axe-348019.uc.r.appspot.com/image");
-    var request = http.MultipartRequest("POST", postUri);
-    print('ok');
-    // print(await image.bytes);
-    request.files.add(await http.MultipartFile.fromBytes('image', await image.readAsBytes(), filename: "upload.jpg"));
-
-    // request.files.add(await http.MultipartFile.fromPath('image', image.name));
-    // request.files.add(http.MultipartFile.fromBytes('file', await File.fromUri(Uri.parse(image.name)).readAsBytes(), contentType: new MediaType('image', 'png')));
-
-    print('sending data');
-    request.send().then((response) {
-      if (response.statusCode == 200) print(response);
-    });
-
-
-    // var multiPFile = await MultipartFile.fromBytes(file.bytes,
-    //     filename: file.name, contentType: MediaType.parse(mimeType));
-
-    // print(formDataImage);
-    // print('sending data');
-    // var imageResponse =
-    // await dio.post('http://global-axe-348019.uc.r.appspot.com/image', data: formDataImage);
-    //
-    // print(imageResponse);
-
-    // var recognitions = detectionResponse.data['response'][0]['detections'];
-    setState(() {
-      // _recognitions = recognitions;
-      // _imagePrediction = imageResponse.toString();
-    });
   }
 
   Image imageFromBase64String(String base64String) {
@@ -153,8 +95,8 @@ class _ResultPageState extends State<ResultPage> {
 
   @override
   Widget build(BuildContext context) {
-
-
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+    _architecture = args['architecture'];
     return Scaffold(
         backgroundColor: const Color(0xFFFAF4ED),
         body: Center(
@@ -162,19 +104,19 @@ class _ResultPageState extends State<ResultPage> {
             width: 400,
             child: Stack(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/images/LASTPAGE/BG-03.png"),
-                        fit: BoxFit.cover
-                    ),
-                  ),),
+                // Container(
+                //   width: double.infinity,
+                //   height: double.infinity,
+                //   decoration: const BoxDecoration(
+                //     image: DecorationImage(
+                //         image: AssetImage("assets/images/LASTPAGE/BG-03.png"),
+                //         fit: BoxFit.cover
+                //     ),
+                //   ),),
                 Container(
                     width: 400,
                     // height: height,
-                    padding: EdgeInsets.fromLTRB(32.0, 128.0, 32.0, 0),
+                    padding: EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 0),
                     child: Column(
                       children: <Widget>[
                         Container(
@@ -187,45 +129,84 @@ class _ResultPageState extends State<ResultPage> {
                                 )
                             )
                         ),
-                        SizedBox(height: 64.0),
-                        GridView.count(
-                          primary: false,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          crossAxisCount: 1,
-                          childAspectRatio: 4.0,
-                          shrinkWrap: true,
-                          children: <Widget>[
+                        SizedBox(height: 16.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
                             Text('Segmentation Map', style: TextStyle(
                                 color: Colors.white
                             )),
-                            kIsWeb ? Image.network(_imageOriginal.path) : Image.file(_imageOriginal)
-                            ,
-                            Text('Raw Image', style: TextStyle(
+                            SizedBox(height: 8),
+                            _imagePrediction != '' ? Image.memory(base64Decode(_imagePrediction)) : Container(
+                              height: 180,
+                              width: 400,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFFFF).withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+
+                            Text('Original Image', style: TextStyle(
                                 color: Colors.white
                             )),
-                            if (_imagePrediction != '') Image.memory(base64Decode(_imagePrediction)),
+                            SizedBox(height: 8),
+                            _imageOriginal != '' ?  Image.memory(base64Decode(_imageOriginal)):
+                            Container(
+                              height: 180,
+                              width: 400,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFFFF).withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ) ,
+                            SizedBox(height: 8) ,
+
+
+                            Text('Overlayed Image', style: TextStyle(
+                                color: Colors.white
+                            )),
+                            SizedBox(height: 8),
+                            _imageOriginal != '' && _imagePrediction != '' ? Stack(
+                              children: [
+                                Image.memory(base64Decode(_imageOriginal)),
+                                Opacity(opacity: 0.3 ,child: Image.memory(base64Decode(_imagePrediction)))
+                              ],
+                            ) : Container(
+                              height: 180,
+                              width: 400,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFFFF).withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            // _imagePrediction != '' && kIsWeb ? Image.network(_imageOriginal.path, width: double.infinity) : Image.file(_imageOriginal, width: double.infinity),
+
+
                             // Text('Overlayed', style: TextStyle(
                             //     color: Colors.white
                             // )),
                             GestureDetector(
                               onTap: () async {
-                                // selectFromImagePicker(false);
-                                selectImage();
+                                selectImageAndPredict();
                               },
                               child: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF404CD0),
-                                    borderRadius: BorderRadius.circular(28.0),
-                                  ),
-                                  child: Text('Camera', style: TextStyle(
-                                      fontSize: 20.0,
-                                      color: Colors.white
-                                  ))
-                              ),
+                                alignment: Alignment.center,
+                                height: 80,
+                                padding: EdgeInsets.symmetric(horizontal: 40),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF404CD0),
+                                  borderRadius: BorderRadius.circular(28.0),
+                                ),
+                                child: Text('Select image', style: TextStyle(
+                                    fontSize: 20.0,
+                                    color: Colors.white
+                                )),
+                              )
                             ),
-                          ],),
+                          ]
+                        )
                       ],
                     )
                 ),
