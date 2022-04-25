@@ -74,7 +74,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     Positioned(
                       bottom: 40,
-                      child: Text('Code by Daniel A \n Design by Yemima S A', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white),),
+                      child: Text('Code by Daniel A \n Design by Yemima S A', textAlign: TextAlign.center, style: TextStyle(fontSize: 8, color: Colors.white),),
                     ),
                     Positioned(
                       bottom: 120,
