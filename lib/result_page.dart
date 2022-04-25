@@ -249,7 +249,7 @@ class _ResultPageState extends State<ResultPage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('Segmentation Map', style: TextStyle(
+                                Text('Original Image', style: TextStyle(
                                     color: Colors.white
                                 )),
                                 SizedBox(height: 8),
@@ -263,7 +263,7 @@ class _ResultPageState extends State<ResultPage> {
                                 ),
                                 SizedBox(height: 8),
 
-                                Text('Original Image', style: TextStyle(
+                                Text('Segmentation Map', style: TextStyle(
                                     color: Colors.white
                                 )),
                                 SizedBox(height: 8),
@@ -315,7 +315,7 @@ class _ResultPageState extends State<ResultPage> {
                                       color: Color(0xFF404CD0),
                                       borderRadius: BorderRadius.circular(28.0),
                                     ),
-                                    child: Text('Select image', style: TextStyle(
+                                    child: Text('Select Image', style: TextStyle(
                                         fontSize: 20.0,
                                         color: Colors.white
                                     )),
