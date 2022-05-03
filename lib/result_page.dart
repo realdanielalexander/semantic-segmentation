@@ -280,7 +280,7 @@ class _ResultPageState extends State<ResultPage> {
                                 SizedBox(height: 8) ,
 
 
-                                Text('Overlayed Image', style: TextStyle(
+                                Text('Overlay Image', style: TextStyle(
                                     color: Colors.white
                                 )),
                                 SizedBox(height: 8),
