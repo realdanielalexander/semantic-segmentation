@@ -9,6 +9,7 @@ class MethodSelection extends StatefulWidget {
 
 class _MethodSelectionState extends State<MethodSelection> {
   var _selectedArchitecture = '';
+  late var _image;
   List<String> architectures = [
     '64',
     '128',
@@ -36,6 +37,9 @@ class _MethodSelectionState extends State<MethodSelection> {
     double height = mediaQuery.size.height -
         appBar.preferredSize.height -
         mediaQuery.padding.top;
+
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+    _image = args['image'];
 
     return SafeArea(
       child: Scaffold(
@@ -283,8 +287,7 @@ class _MethodSelectionState extends State<MethodSelection> {
                             // if (_selectedLR == '') return;
                             Navigator.pushNamed(context, '/result-page', arguments: {
                               'architecture': _selectedArchitecture,
-                              // 'epochs': _selectedEpochs,
-                              // 'learningRate': _selectedLR,
+                              'image': _image
                             }
                             );
                           },

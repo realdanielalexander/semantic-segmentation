@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -78,9 +79,10 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     Positioned(
                       bottom: 120,
-                      child: TextButton(onPressed: () {
+                      child: TextButton(onPressed: () async {
+                        var result = await FilePicker.platform.pickFiles();
                         Navigator.pushReplacementNamed(
-                            context, '/method-selection');
+                            context, '/method-selection', arguments: {"image": result});
                       },
                           child: Text("Start", style: TextStyle(fontSize: 24)),
                           style: ButtonStyle(

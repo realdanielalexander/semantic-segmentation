@@ -24,6 +24,7 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   ImagePicker _picker = ImagePicker();
   // late String _imageOriginalPath;
+  late var _image;
   String _imageOriginal = '';
   String _imagePrediction = '';
   late double _imageWidth;
@@ -35,12 +36,8 @@ class _ResultPageState extends State<ResultPage> {
   late String _learningRate;
   late String _architecture;
 
-  selectImageAndPredict() async {
-    var result = await FilePicker.platform.pickFiles();
-    
-    // var result2 = FilePickerResult(result!.files);
-    // var result2 = await FilePicker.platform.pickFiles(withReadStream: true);
-    // var result2 = List.from(result!.files);
+  predict(var result) async {
+    // var result = await FilePicker.platform.pickFiles();
     if (result != null) {
       setState(() {
         _isBusy = true;
@@ -94,6 +91,10 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     _architecture = args['architecture'];
+    _image = args['image'];
+
+    if (_imageOriginal == '') predict(_image);
+
     return ModalProgressHUD(
       inAsyncCall: _isBusy,
       child: Scaffold(
@@ -303,24 +304,24 @@ class _ResultPageState extends State<ResultPage> {
                                 // Text('Overlayed', style: TextStyle(
                                 //     color: Colors.white
                                 // )),
-                                GestureDetector(
-                                  onTap: () async {
-                                    selectImageAndPredict();
-                                  },
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 80,
-                                    padding: EdgeInsets.symmetric(horizontal: 40),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF404CD0),
-                                      borderRadius: BorderRadius.circular(28.0),
-                                    ),
-                                    child: Text('Select Image', style: TextStyle(
-                                        fontSize: 20.0,
-                                        color: Colors.white
-                                    )),
-                                  )
-                                ),
+                                // GestureDetector(
+                                //   onTap: () async {
+                                //     // selectImageAndPredict();
+                                //   },
+                                //   child: Container(
+                                //     alignment: Alignment.center,
+                                //     height: 80,
+                                //     padding: EdgeInsets.symmetric(horizontal: 40),
+                                //     decoration: BoxDecoration(
+                                //       color: Color(0xFF404CD0),
+                                //       borderRadius: BorderRadius.circular(28.0),
+                                //     ),
+                                //     child: Text('Select Image', style: TextStyle(
+                                //         fontSize: 20.0,
+                                //         color: Colors.white
+                                //     )),
+                                //   )
+                                // ),
                               ]
                             )
                           ],
