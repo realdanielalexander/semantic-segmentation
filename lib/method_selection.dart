@@ -95,7 +95,9 @@ class _MethodSelectionState extends State<MethodSelection> {
                               height: 80,
                               padding: EdgeInsets.symmetric(horizontal: 40),
                               decoration: BoxDecoration(
-                                color: _selectedArchitecture == '64' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                color: Color(0xFF2C3546),
+                                // color: _selectedArchitecture == '64' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                border: _selectedArchitecture == '64' ? Border.all(color: Colors.white,): null,
                                 borderRadius: BorderRadius.circular(28.0),
                               ),
                               child: Row(
@@ -123,7 +125,7 @@ class _MethodSelectionState extends State<MethodSelection> {
                                                           fontSize: 18,
                                                           fontWeight: FontWeight.bold
                                                       )),
-                                                  Text('Max Accuracy: 78% mIoU with 300 epochs and 0.0001 Learning Rate', textAlign: TextAlign.center)
+                                                  Text('Max Accuracy: 75.423% average validation mIoU with 300 epochs and 0.0001 learning rate', textAlign: TextAlign.center)
                                                 ],
                                               )
                                             );
@@ -148,7 +150,9 @@ class _MethodSelectionState extends State<MethodSelection> {
                               height: 80,
                               padding: EdgeInsets.symmetric(horizontal: 40),
                               decoration: BoxDecoration(
-                                color: _selectedArchitecture == '128' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                color: Color(0xFF2C3546),
+                                // color: _selectedArchitecture == '64' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                border: _selectedArchitecture == '128' ? Border.all(color: Colors.white,): null,
                                 borderRadius: BorderRadius.circular(28.0),
                               ),
                               child: Row(
@@ -176,7 +180,7 @@ class _MethodSelectionState extends State<MethodSelection> {
                                                             fontSize: 18,
                                                             fontWeight: FontWeight.bold
                                                         )),
-                                                    Text('Max Accuracy: 79% with 300 epochs and 0.0001 Learning Rate', textAlign: TextAlign.center)
+                                                    Text('Max Accuracy: 75.274% mean validation mIoU with 300 epochs and 0.0001 Learning Rate', textAlign: TextAlign.center)
                                                   ],
                                                 )
                                             );
@@ -201,7 +205,9 @@ class _MethodSelectionState extends State<MethodSelection> {
                               height: 80,
                               padding: EdgeInsets.symmetric(horizontal: 40),
                               decoration: BoxDecoration(
-                                color: _selectedArchitecture == '256' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                color: Color(0xFF2C3546),
+                                // color: _selectedArchitecture == '64' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                border: _selectedArchitecture == '256' ? Border.all(color: Colors.white,): null,
                                 borderRadius: BorderRadius.circular(28.0),
                               ),
                               child: Row(
@@ -229,7 +235,7 @@ class _MethodSelectionState extends State<MethodSelection> {
                                                             fontSize: 18,
                                                             fontWeight: FontWeight.bold
                                                         )),
-                                                    Text('Max Accuracy: 80% with 300 epochs and 0.0001 Learning Rate', textAlign: TextAlign.center)
+                                                    Text('Max Accuracy: 76.478% average validation mIoU with 300 epochs and 0.0001 Learning Rate', textAlign: TextAlign.center)
                                                   ],
                                                 )
                                             );
@@ -296,12 +302,12 @@ class _MethodSelectionState extends State<MethodSelection> {
                               height: 80,
                               padding: EdgeInsets.symmetric(horizontal: 40),
                               decoration: BoxDecoration(
-                                color: _selectedArchitecture != '' ? Color(0xFF404CD0) : Color(0xFF2C3546),
+                                color: _selectedArchitecture != '' ? Color(0xFF404CD0) : Colors.grey,
                                 borderRadius: BorderRadius.circular(28.0),
                               ),
                               child: Text('Predict', style: TextStyle(
                                   fontSize: 20.0,
-                                  color: Colors.white
+                                  color: _selectedArchitecture != '' ? Colors.white : Colors.black38,
                               )),
                           ),
                         ),
