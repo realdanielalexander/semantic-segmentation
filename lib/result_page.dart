@@ -43,7 +43,7 @@ class _ResultPageState extends State<ResultPage> {
         _isBusy = true;
       });
       Uint8List file = result.files.single.bytes!;
-      var request = http.MultipartRequest('POST', Uri.parse('https://global-axe-348019.uc.r.appspot.com/original'));
+      var request = http.MultipartRequest('POST', Uri.parse('http://localhost:5000/resize'));
 
       request.files.add(
           http.MultipartFile.fromBytes(
@@ -56,14 +56,8 @@ class _ResultPageState extends State<ResultPage> {
       var streamedResponse = await request.send();
       var predictionResponse = await http.Response.fromStream(streamedResponse);
 
-      if (_architecture == '64') {
-        request = http.MultipartRequest('POST', Uri.parse('https://global-axe-348019.uc.r.appspot.com/image-64'));
-      } else if (_architecture == '128') {
-        request = http.MultipartRequest('POST', Uri.parse('https://global-axe-348019.uc.r.appspot.com/image-128'));
-      } else {
-        request = http.MultipartRequest('POST', Uri.parse('https://global-axe-348019.uc.r.appspot.com/image-256'));
-      }
-
+      request = http.MultipartRequest('POST', Uri.parse('http://localhost:5000/predict'));
+      request.fields['architecture'] = _architecture;
       request.files.add(
           http.MultipartFile.fromBytes(
               'images',
