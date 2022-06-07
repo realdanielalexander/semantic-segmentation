@@ -224,7 +224,7 @@ class _ResultPageState extends State<ResultPage> {
                                                       leading: Container(
                                                         height: 20,
                                                         width: 20,
-                                                        color: Color.fromRGBO(128, 0, 0, 1),
+                                                        color: Color.fromRGBO(128, 128, 0, 1),
                                                       ),
                                                       title: Text('Tree'),
                                                     ),
